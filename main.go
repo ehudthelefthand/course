@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/ehudthelefthand/course/db"
+	"github.com/ehudthelefthand/course/model"
 	"github.com/gin-gonic/gin"
 )
 
@@ -19,6 +20,7 @@ func main() {
 
 	r.GET("/courses", listCourses(db))
 	r.GET("/courses/:id", getCourse(db))
+	r.POST("/courses", createCourse(db))
 
 	r.Run(":8080")
 }
@@ -54,5 +56,24 @@ func getCourse(db *db.DB) gin.HandlerFunc {
 			return
 		}
 		c.IndentedJSON(http.StatusOK, course)
+	}
+}
+
+func createCourse(db *db.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		req := new(model.Course)
+		if err := c.BindJSON(req); err != nil {
+			c.IndentedJSON(http.StatusBadRequest, gin.H{
+				"message": "can not parse course",
+			})
+			return
+		}
+		if err := db.CreateCourse(req); err != nil {
+			c.IndentedJSON(http.StatusInternalServerError, gin.H{
+				"message": "server error",
+			})
+			return
+		}
+		c.IndentedJSON(http.StatusOK, req)
 	}
 }
