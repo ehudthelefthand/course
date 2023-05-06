@@ -110,3 +110,58 @@ func (db *DB) SaveClass(cls *model.Class) error {
 	cls.ID = class.ID
 	return nil
 }
+
+func (db *DB) GetClass(id uint) (*model.Class, error) {
+	var class Class
+	err := db.db.Preload("Course").
+		Preload("Trainer").
+		Preload("Students.Student").
+		First(&class, id).Error
+	if err != nil {
+		return nil, err
+	}
+
+	students := []model.Student{}
+	for _, stu := range class.Students {
+		students = append(students, model.Student{
+			ID:   stu.StudentID,
+			Name: stu.Student.Username,
+		})
+	}
+
+	return &model.Class{
+		ID: class.ID,
+		Course: model.Course{
+			ID:          class.Course.ID,
+			Name:        class.Course.Name,
+			Description: class.Course.Description,
+		},
+		Trainer: model.Trainer{
+			ID:   class.Trainer.ID,
+			Name: class.Trainer.Username,
+		},
+		Start:    class.Start,
+		End:      class.End,
+		Seats:    class.Seats,
+		Students: students,
+	}, nil
+}
+
+func (db *DB) GetStudent(id uint) (*model.Student, error) {
+	var student User
+	if err := db.db.First(&student, id).Error; err != nil {
+		return nil, err
+	}
+	return &model.Student{
+		ID:   student.ID,
+		Name: student.Username,
+	}, nil
+}
+
+func (db *DB) CreateClassStudent(studentID uint, classID uint) error {
+	classStudent := ClassStudent{
+		StudentID: studentID,
+		ClassID:   classID,
+	}
+	return db.db.Create(&classStudent).Error
+}

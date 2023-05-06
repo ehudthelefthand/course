@@ -23,6 +23,7 @@ func main() {
 	r.GET("/courses/:id", getCourse(db))
 	r.POST("/courses", createCourse(db))
 	r.POST("/classes", createClasses(db))
+	r.POST("/enrollments", enrollClass(db))
 
 	r.Run(":8080")
 }
@@ -121,6 +122,51 @@ func createClasses(db *db.DB) gin.HandlerFunc {
 		class.Trainer.ID = req.TrainerID
 
 		if err := db.SaveClass(class); err != nil {
+			c.IndentedJSON(http.StatusInternalServerError, gin.H{
+				"message": err.Error(),
+			})
+			return
+		}
+
+		c.Status(http.StatusOK)
+	}
+}
+
+type EnrollmentReq struct {
+	StudentID uint `json:"student_id"`
+	ClassID   uint `json:"class_id"`
+}
+
+func enrollClass(db *db.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		req := new(EnrollmentReq)
+		if err := c.BindJSON(req); err != nil {
+			c.IndentedJSON(http.StatusBadRequest, gin.H{
+				"message": err.Error(),
+			})
+			return
+		}
+		class, err := db.GetClass(req.ClassID)
+		if err != nil {
+			c.IndentedJSON(http.StatusBadRequest, gin.H{
+				"message": err.Error(),
+			})
+			return
+		}
+		student, err := db.GetStudent(req.StudentID)
+		if err != nil {
+			c.IndentedJSON(http.StatusBadRequest, gin.H{
+				"message": err.Error(),
+			})
+			return
+		}
+		if err := class.AddStudent(*student); err != nil {
+			c.IndentedJSON(http.StatusBadRequest, gin.H{
+				"message": err.Error(),
+			})
+			return
+		}
+		if err := db.CreateClassStudent(student.ID, class.ID); err != nil {
 			c.IndentedJSON(http.StatusInternalServerError, gin.H{
 				"message": err.Error(),
 			})
