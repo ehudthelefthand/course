@@ -37,9 +37,9 @@ func (c *Class) AddStudent(student Student) error {
 }
 
 type Course struct {
-	ID          uint
-	Name        string
-	Description string
+	ID          uint   `json:"id"`
+	Name        string `json:"name"`
+	Description string `json:"desc"`
 }
 
 func (c *Course) CreateClass(start time.Time, end time.Time) (*Class, error) {
