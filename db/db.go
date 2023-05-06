@@ -1,6 +1,7 @@
 package db
 
 import (
+	"log"
 	"time"
 
 	"github.com/ehudthelefthand/course/model"
@@ -21,6 +22,16 @@ func NewDB() (*DB, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	if err := db.Migrator().AutoMigrate(
+		&User{},
+		&Course{},
+		&Class{},
+		&ClassStudent{},
+	); err != nil {
+		log.Fatal(err)
+	}
+
 	return &DB{db: db}, nil
 }
 
@@ -52,6 +63,19 @@ type ClassStudent struct {
 type User struct {
 	ID       uint `gorm:"primaryKey"`
 	Username string
+	Password string
+}
+
+func (db *DB) CreateUser(u *model.User) error {
+	user := User{
+		Username: u.Username,
+		Password: u.Password,
+	}
+	if err := db.db.Create(&user).Error; err != nil {
+		return err
+	}
+	u.ID = user.ID
+	return nil
 }
 
 func (db *DB) CreateCourse(c *model.Course) error {

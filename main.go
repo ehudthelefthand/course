@@ -21,6 +21,7 @@ func main() {
 	r.POST("/courses", handler.CreateCourse(db))
 	r.POST("/classes", handler.CreateClasses(db))
 	r.POST("/enrollments", handler.EnrollClass(db))
+	r.POST("/register", handler.Register(db))
 
 	r.Run(":8080")
 }

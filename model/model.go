@@ -63,3 +63,9 @@ type Student struct {
 	ID   uint
 	Name string
 }
+
+type User struct {
+	ID       uint
+	Username string
+	Password string
+}
