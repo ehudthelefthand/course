@@ -16,8 +16,8 @@ type Class struct {
 }
 
 func (c *Class) SetSeats(seats int) error {
-	if seats < 0 {
-		return errors.New("invalid seats, seats can not be negative")
+	if seats <= 0 {
+		return errors.New("invalid seats, seats can not be zero or negative")
 	}
 	c.Seats = seats
 	return nil

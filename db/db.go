@@ -1,6 +1,8 @@
 package db
 
 import (
+	"time"
+
 	"github.com/ehudthelefthand/course/model"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -26,6 +28,30 @@ type Course struct {
 	ID          uint `gorm:"primaryKey"`
 	Name        string
 	Description string
+}
+
+type Class struct {
+	ID        uint `gorm:"primaryKey"`
+	CourseID  uint
+	Course    Course
+	TrainerID uint
+	Trainer   User
+	Start     time.Time
+	End       time.Time
+	Seats     int
+	Students  []ClassStudent
+}
+
+type ClassStudent struct {
+	ID        uint `gorm:"primaryKey"`
+	ClassID   uint
+	StudentID uint
+	Student   User
+}
+
+type User struct {
+	ID       uint `gorm:"primaryKey"`
+	Username string
 }
 
 func (db *DB) CreateCourse(c *model.Course) error {
@@ -68,4 +94,19 @@ func (db *DB) GetAllCourse() ([]model.Course, error) {
 	}
 
 	return result, nil
+}
+
+func (db *DB) SaveClass(cls *model.Class) error {
+	class := Class{
+		CourseID:  cls.Course.ID,
+		TrainerID: cls.Trainer.ID,
+		Start:     cls.Start,
+		End:       cls.End,
+		Seats:     cls.Seats,
+	}
+	if err := db.db.Save(&class).Error; err != nil {
+		return err
+	}
+	cls.ID = class.ID
+	return nil
 }

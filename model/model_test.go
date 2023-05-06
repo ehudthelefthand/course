@@ -21,6 +21,10 @@ func TestClass_SetSeats_withInvalidSeats_shouldReturnError(t *testing.T) {
 	if err == nil {
 		t.Fatal("want class.SetSeats(-1) = error, got nil")
 	}
+	err = class.SetSeats(0)
+	if err == nil {
+		t.Fatal("want class.SetSeats(0) = error, got nil")
+	}
 }
 
 func TestCourse_CreateClass_withEndDateBeforeStartDate_shouldReturnError(t *testing.T) {
