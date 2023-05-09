@@ -22,17 +22,33 @@ func NewDB() (*DB, error) {
 	if err != nil {
 		return nil, err
 	}
+	return &DB{db: db}, nil
+}
 
-	if err := db.Migrator().AutoMigrate(
+func (db *DB) Reset() error {
+	err := db.db.Migrator().DropTable(
 		&User{},
 		&Course{},
 		&Class{},
 		&ClassStudent{},
-	); err != nil {
+	)
+	if err != nil {
 		log.Fatal(err)
 	}
+	return err
+}
 
-	return &DB{db: db}, nil
+func (db *DB) AutoMigrate() error {
+	err := db.db.Migrator().AutoMigrate(
+		&User{},
+		&Course{},
+		&Class{},
+		&ClassStudent{},
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return err
 }
 
 type Course struct {
@@ -61,8 +77,8 @@ type ClassStudent struct {
 }
 
 type User struct {
-	ID       uint `gorm:"primaryKey"`
-	Username string
+	ID       uint   `gorm:"primaryKey"`
+	Username string `gorm:"uniqueIndex;not null"`
 	Password string
 }
 
@@ -188,4 +204,17 @@ func (db *DB) CreateClassStudent(studentID uint, classID uint) error {
 		ClassID:   classID,
 	}
 	return db.db.Create(&classStudent).Error
+}
+
+func (db *DB) GetUserByUsername(username string) (*model.User, error) {
+	var user User
+	err := db.db.Where("username = ?", username).First(&user).Error
+	if err != nil {
+		return nil, err
+	}
+	return &model.User{
+		ID:       user.ID,
+		Username: user.Username,
+		Password: user.Password,
+	}, nil
 }

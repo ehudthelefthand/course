@@ -13,6 +13,12 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	// if err := db.Reset(); err != nil {
+	// 	log.Fatal(err)
+	// }
+	if err := db.AutoMigrate(); err != nil {
+		log.Fatal(err)
+	}
 
 	r := gin.Default()
 
@@ -22,6 +28,7 @@ func main() {
 	r.POST("/classes", handler.CreateClasses(db))
 	r.POST("/enrollments", handler.EnrollClass(db))
 	r.POST("/register", handler.Register(db))
+	r.POST("/login", handler.Login(db))
 
 	r.Run(":8080")
 }
