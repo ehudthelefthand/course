@@ -19,7 +19,7 @@ type AuthReq struct {
 	Password string `json:"password"`
 }
 
-func Register(db *db.DB) gin.HandlerFunc {
+func Register(dbx *db.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		req := new(AuthReq)
 		if err := c.BindJSON(req); err != nil {
@@ -36,8 +36,9 @@ func Register(db *db.DB) gin.HandlerFunc {
 		user := model.User{
 			Username: req.Username,
 			Password: string(hash),
+			Role:     db.Student,
 		}
-		if err := db.CreateUser(&user); err != nil {
+		if err := dbx.CreateUser(&user); err != nil {
 			util.SendError(c, http.StatusInternalServerError, err)
 			return
 		}

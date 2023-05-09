@@ -1,6 +1,7 @@
 package db
 
 import (
+	"errors"
 	"log"
 	"time"
 
@@ -76,16 +77,24 @@ type ClassStudent struct {
 	Student   User
 }
 
+const (
+	Student = "student"
+	Trainer = "trainer"
+	Admin   = "admin"
+)
+
 type User struct {
 	ID       uint   `gorm:"primaryKey"`
 	Username string `gorm:"uniqueIndex;not null"`
 	Password string
+	Role     string
 }
 
 func (db *DB) CreateUser(u *model.User) error {
 	user := User{
 		Username: u.Username,
 		Password: u.Password,
+		Role:     u.Role,
 	}
 	if err := db.db.Create(&user).Error; err != nil {
 		return err
@@ -191,6 +200,9 @@ func (db *DB) GetStudent(id uint) (*model.Student, error) {
 	var student User
 	if err := db.db.First(&student, id).Error; err != nil {
 		return nil, err
+	}
+	if student.Role != Student {
+		return nil, errors.New("not a student")
 	}
 	return &model.Student{
 		ID:   student.ID,
