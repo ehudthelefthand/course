@@ -1,19 +1,13 @@
 package handler
 
 import (
-	"log"
+	"errors"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
-	"github.com/gin-gonic/gin"
 )
 
-func sendError(c *gin.Context, status int, err error) {
-	log.Println(err)
-	c.JSON(status, gin.H{
-		"message": err.Error(),
-	})
-}
+const secretKey = "SuperSecret"
 
 type claims struct {
 	UserID uint `json:"user_id"`
@@ -30,4 +24,28 @@ func generateToken(userID uint) (string, error) {
 	}
 	claim := jwt.NewWithClaims(jwt.SigningMethodHS256, payload)
 	return claim.SignedString([]byte(secretKey))
+}
+
+func VerifyToken(token string) (*claims, error) {
+	// Key Func will verify signing method
+	// and return secretKey if signing method is match
+	// otherwise return error
+	keyFunc := func(t *jwt.Token) (interface{}, error) {
+		_, ok := t.Method.(*jwt.SigningMethodHMAC)
+		if !ok {
+			return nil, errors.New("signing method error")
+		}
+		return []byte(secretKey), nil
+	}
+	// Parse Claims
+	jwtToken, err := jwt.ParseWithClaims(token, &claims{}, keyFunc)
+	if err != nil {
+		return nil, err
+	}
+	// Check Claim Type
+	claims, ok := jwtToken.Claims.(*claims)
+	if !ok {
+		return nil, errors.New("invalid token")
+	}
+	return claims, nil
 }

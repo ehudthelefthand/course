@@ -218,3 +218,15 @@ func (db *DB) GetUserByUsername(username string) (*model.User, error) {
 		Password: user.Password,
 	}, nil
 }
+
+func (db *DB) GetUserByID(id uint) (*model.User, error) {
+	var user User
+	err := db.db.First(&user, id).Error
+	if err != nil {
+		return nil, err
+	}
+	return &model.User{
+		ID:       user.ID,
+		Username: user.Username,
+	}, nil
+}

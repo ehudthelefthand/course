@@ -5,6 +5,7 @@ import (
 
 	"github.com/ehudthelefthand/course/db"
 	"github.com/ehudthelefthand/course/handler"
+	"github.com/ehudthelefthand/course/middleware"
 	"github.com/gin-gonic/gin"
 )
 
@@ -26,7 +27,7 @@ func main() {
 	r.GET("/courses/:id", handler.GetCourse(db))
 	r.POST("/courses", handler.CreateCourse(db))
 	r.POST("/classes", handler.CreateClasses(db))
-	r.POST("/enrollments", handler.EnrollClass(db))
+	r.POST("/enrollments", middleware.RequireUser(db), handler.EnrollClass(db))
 	r.POST("/register", handler.Register(db))
 	r.POST("/login", handler.Login(db))
 
