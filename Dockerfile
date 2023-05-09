@@ -1,10 +1,13 @@
-FROM golang
+FROM golang:1.19
 
 WORKDIR /app
 
-COPY . /app
+COPY go.mod go.sum ./
+RUN go mod download
 
-RUN go build -o api
+COPY . ./
+
+RUN CGO_ENABLED=0 GOOS=linux go build -o api
 
 EXPOSE 8080
 
