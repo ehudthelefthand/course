@@ -1,0 +1,32 @@
+version: "3.9"
+
+services:
+  postgresql:
+    image: postgres:12
+    restart: always
+    environment:
+      - POSTGRES_USER=peagolang
+      - POSTGRES_PASSWORD=supersecret
+      - POSTGRES_DB=peagolang
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    ports:
+      - "54330:5432"
+    networks:
+      - peago
+
+  api:
+    image: peago2
+    restart: always
+    depends_on:
+      - postgresql
+    ports:
+      - 8080:8080
+    environment:
+      - DATABASE_URL="host=postgresql user=peagolang password=supersecret dbname=peagolang port=5432 sslmode=disable"
+    networks:
+      - peago
+  
+networks:
+  peago:
+    driver: bridge

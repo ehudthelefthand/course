@@ -3,6 +3,7 @@ package gorm
 import (
 	"errors"
 	"log"
+	"os"
 	"time"
 
 	"github.com/ehudthelefthand/course/model"
@@ -16,7 +17,8 @@ type DB struct {
 }
 
 func NewDB() (*DB, error) {
-	url := "host=localhost user=peagolang password=supersecret dbname=peagolang port=54329 sslmode=disable"
+	// url := "host=localhost user=peagolang password=supersecret dbname=peagolang port=54329 sslmode=disable"
+	url := os.Getenv("DATABASE_URL")
 	db, err := gorm.Open(postgres.Open(url), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Info),
 	})
