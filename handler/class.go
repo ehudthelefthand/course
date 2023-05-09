@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/ehudthelefthand/course/db"
+	"github.com/ehudthelefthand/course/gorm"
 	"github.com/ehudthelefthand/course/util"
 	"github.com/gin-gonic/gin"
 )
@@ -17,7 +17,7 @@ type ClassReq struct {
 	Seats     int       `json:"seats"`
 }
 
-func CreateClasses(db *db.DB) gin.HandlerFunc {
+func CreateClasses(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		req := new(ClassReq)
 		if err := c.BindJSON(req); err != nil {

@@ -3,7 +3,7 @@ package handler
 import (
 	"net/http"
 
-	"github.com/ehudthelefthand/course/db"
+	"github.com/ehudthelefthand/course/gorm"
 	"github.com/ehudthelefthand/course/util"
 	"github.com/gin-gonic/gin"
 )
@@ -12,7 +12,7 @@ type EnrollmentReq struct {
 	ClassID uint `json:"class_id"`
 }
 
-func EnrollClass(db *db.DB) gin.HandlerFunc {
+func EnrollClass(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		req := new(EnrollmentReq)
 		if err := c.BindJSON(req); err != nil {

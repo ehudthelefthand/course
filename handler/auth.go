@@ -3,7 +3,7 @@ package handler
 import (
 	"net/http"
 
-	"github.com/ehudthelefthand/course/db"
+	"github.com/ehudthelefthand/course/gorm"
 	"github.com/ehudthelefthand/course/model"
 	"github.com/ehudthelefthand/course/util"
 	"github.com/gin-gonic/gin"
@@ -19,7 +19,7 @@ type AuthReq struct {
 	Password string `json:"password"`
 }
 
-func Register(dbx *db.DB) gin.HandlerFunc {
+func Register(dbx *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		req := new(AuthReq)
 		if err := c.BindJSON(req); err != nil {
@@ -36,7 +36,7 @@ func Register(dbx *db.DB) gin.HandlerFunc {
 		user := model.User{
 			Username: req.Username,
 			Password: string(hash),
-			Role:     db.Student,
+			Role:     gorm.Student,
 		}
 		if err := dbx.CreateUser(&user); err != nil {
 			util.SendError(c, http.StatusInternalServerError, err)
@@ -55,7 +55,7 @@ func Register(dbx *db.DB) gin.HandlerFunc {
 	}
 }
 
-func Login(db *db.DB) gin.HandlerFunc {
+func Login(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		req := new(AuthReq)
 		if err := c.BindJSON(req); err != nil {

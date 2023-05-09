@@ -5,13 +5,13 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/ehudthelefthand/course/db"
+	"github.com/ehudthelefthand/course/gorm"
 	"github.com/ehudthelefthand/course/handler"
 	"github.com/ehudthelefthand/course/util"
 	"github.com/gin-gonic/gin"
 )
 
-func RequireUser(db *db.DB) gin.HandlerFunc {
+func RequireUser(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Get header
 		header := c.GetHeader("Authorization")

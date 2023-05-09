@@ -5,12 +5,13 @@ import (
 	"strconv"
 
 	"github.com/ehudthelefthand/course/db"
+	"github.com/ehudthelefthand/course/gorm"
 	"github.com/ehudthelefthand/course/model"
 	"github.com/ehudthelefthand/course/util"
 	"github.com/gin-gonic/gin"
 )
 
-func ListCourses(db *db.DB) gin.HandlerFunc {
+func ListCourses(db db.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		courses, err := db.GetAllCourse()
 		if err != nil {
@@ -21,7 +22,7 @@ func ListCourses(db *db.DB) gin.HandlerFunc {
 	}
 }
 
-func GetCourse(db *db.DB) gin.HandlerFunc {
+func GetCourse(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		idStr := c.Param("id")
 		id, err := strconv.Atoi(idStr)
@@ -38,7 +39,7 @@ func GetCourse(db *db.DB) gin.HandlerFunc {
 	}
 }
 
-func CreateCourse(db *db.DB) gin.HandlerFunc {
+func CreateCourse(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		req := new(model.Course)
 		if err := c.BindJSON(req); err != nil {
